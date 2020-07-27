@@ -57,7 +57,58 @@ class TickleGestureRecognizer: UIGestureRecognizer {
         }
     }
     
+    /// Sent to the gesture recognizer when one or more fingers touch down in the associated view.
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        guard let touch = touches.first else {
+            return
+        }
         
+        tickleStartLocation = touch.location(in: view)
+    }
+    
+    /// Sent to the gesture recognizer when one or more fingers move in the associated view.
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        let tickleLocation = touch.location(in: view)
+        
+        let horizontalDifference = tickleLocation.x - tickleStartLocation.x
+        
+        if abs(horizontalDifference) < CGFloat(distanceForTicleGesture) {
+            return
+        }
+        
+        let direction: TickleDirection
+        
+        if (horizontalDifference < 0) {
+            direction = .left
+        } else {
+            direction = .right
+        }
+        
+        if latestDirection == .unknow ||
+            (latestDirection == .left && direction == .right) ||
+            (latestDirection == .right && direction == .left) {
+            
+            tickleStartLocation = tickleLocation
+            latestDirection = direction
+            tickleCount += 1
+            
+            if state == .possible && tickleCount > requiredTickles {
+                state = .ended
+            }
+        }
+    }
+    
+    /// Sent to the gesture recognizer when one or more fingers lift from the associated view.
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        reset()
+    }
+    
+    /// Sent to the gesture recognizer when a system event (such as an incoming phone call) cancels a touch event.
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+        reset()
     }
 }

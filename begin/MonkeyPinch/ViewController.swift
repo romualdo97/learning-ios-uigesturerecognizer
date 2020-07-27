@@ -36,6 +36,7 @@ class ViewController: UIViewController {
   @IBOutlet var monkeyPanRecognizer: UIPanGestureRecognizer!
 
   private var chompPlayer: AVAudioPlayer?
+  private var laughPlayer: AVAudioPlayer?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -59,10 +60,14 @@ class ViewController: UIViewController {
       tapGesture.require(toFail: bananaPanRecognizer)
       tapGesture.require(toFail: monkeyPanRecognizer)
       
-      // TODO: add a custom gesture recognizer too
+      let tickleGesture = TickleGestureRecognizer(target: self, action: #selector(handleTickle(_:)))
+      tickleGesture.delegate = self
+      imageView.addGestureRecognizer(tickleGesture)
     }
     
     chompPlayer = createPlayer(from: "chomp")
+    
+    laughPlayer = createPlayer(from: "laugh")
   }
   
   func createPlayer(from filename: String) -> AVAudioPlayer? {
@@ -127,7 +132,6 @@ class ViewController: UIViewController {
       animations: {
         gestureView.center = finalPoint
     })
-    
   }
   
   @IBAction func handlePinch(_ gesture: UIPinchGestureRecognizer) {
@@ -151,6 +155,10 @@ class ViewController: UIViewController {
 
   @objc func handleTap(_ gesture: UITapGestureRecognizer) {
     chompPlayer?.play()
+  }
+  
+  @objc func handleTickle(_ gesture: TickleGestureRecognizer) {
+    laughPlayer?.play()
   }
 }
 
